@@ -1,0 +1,19 @@
+# Simulation files
+*.vcd
+*.vvp
+*.out
+*.log
+
+# GTKWave
+*.gtkw
+
+# Object files
+*.o
+
+# Python (if you build an assembler)
+__pycache__/
+*.pyc
+
+# OS noise
+.DS_Store
+Thumbs.db
