@@ -1,183 +1,164 @@
 
+# 🕹️ UNGA BUNGA Console
 
-# UNGA BUNGA Console
-
-## Bunga -- 8 CPU
-
-|                    |                      |
-|--------------------|----------------------|
-| CPU Name           | Bunga -- 8           |
-| Data Width         | 8 Bit                |
-| Address Width      | 16 Bit               |
-| Addressable Memory | 64KB                 |
-| Endian             | Little Endian        |
-| Pipeline           | 3 Stage (IF, ID, EXE)|
-| Bus Type           | Von Neuman           |
+A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8**. Designed for learning and experimentation, it mimics retro-style hardware with modern HDL techniques.
 
 ---
 
-## Register Set
+## ⚙️ BUNGA–8 CPU Overview
 
-| Name | Code | Size | Description       |
-|------|------|------|-------------------|
-| R0   | 0000 | 16   | GPR               |
-| R1   | 0001 | 16   | GPR               |
-| R2   | 0010 | 16   | GPR               |
-| R3   | 0011 | 16   | GPR               |
-| R4   | 0100 | 16   | GPR               |
-| R5   | 0101 | 16   | GPR               |
-| R6   | 0110 | 16   | GPR               |
-| R7   | 0111 | 16   | GPR               |
-| A    | 1000 | 16   | Accumulator       |
-| SP   | 1001 | 16   | Stack Pointer     |
-| PC   | 1010 | 16   | Program Counter   |
-| FL   | 1011 | 8    | Flag (Z, C, N, V) |
-| IO0  | 1100 | 16   | GPIO              |
-| IO1  | 1101 | 16   | I/O port addr     |
-| IO2  | 1110 | 16   | GPU/PPU control   |
-| IO3  | 1111 | 16   | Audio Output      |
+| Field               | Value                  |
+|---------------------|------------------------|
+| **CPU Name**        | BUNGA–8                |
+| **Data Width**      | 8-bit                  |
+| **Address Width**   | 16-bit                 |
+| **Memory Size**     | 64KB                   |
+| **Endian**          | Little Endian          |
+| **Pipeline**        | 3-stage (IF, ID, EXE)  |
+| **Bus Type**        | Von Neumann            |
 
 ---
 
-## Memory Map
+## 🧠 Register Set
 
-| Range           | Size | Description     |
-|-----------------|------|-----------------|
-| 0x0000-0x1FFF   | 8KB  | ROM             |
-| 0x2000-0x3FFF   | 8KB  | RAM             |
-| 0x4000-0x5FFF   | 8KB  | VRAM            |
-| 0x6000-0x6FFF   | 4KB  | I/O Ports       |
-| 0x7000-0x7FFF   | 4KB  | Free            |
-| 0x8000-0xFFFF   | 32KB | Secondary ROM   |
-
----
-
-## Flags
-
-| Code | Name | Description       |
-|------|------|-------------------|
-| 000  | Z    | Zero              |
-| 001  | C    | Carry             |
-| 010  | N    | Negative (MSB)    |
-| 011  | V    | Overflow          |
-| 100  | I    | Interrupt Enable  |
-| 101  | -    | For future use    |
-| 110  | -    | For future use    |
-| 111  | -    | For future use    |
+| Name | Code  | Size | Description         |
+|------|-------|------|---------------------|
+| R0–R7 | 0000–0111 | 8  | General Purpose Registers |
+| A    | 1000  | 8    | Accumulator         |
+| SP   | 1001  | 16   | Stack Pointer       |
+| PC   | 1010  | 16   | Program Counter     |
+| FL   | 1011  | 8    | Flag Register (Z,C,N,V) |
+| IO0–IO3 | 1100–1111 | 8 | I/O Registers (GPIO, Audio, etc.) |
 
 ---
 
-# Instruction Set Architecture (ISA)
+## 🗺️ Memory Map
 
-There are three classes of instructions:
-
-1. 1-Byte
-2. 2-Byte
-3. 3-Byte
-
-Each class has its own encoding scheme to maximize bit efficiency.
-
----
-
-### 1-Byte Instructions
-
-- Contains opcode and an optional flag or register.
-- 5-bit opcode, 3-bit register (lower bits only → R0–R7).
-
-#### Format:
-
-OP Rn => [opcode][mode/reg_id] 5b 3b
-
-
-#### Example:
-
-INC R0 => 00100 000
-
+| Range         | Size  | Description       |
+|---------------|-------|-------------------|
+| 0x0000–0x1FFF | 8KB   | ROM               |
+| 0x2000–0x3FFF | 8KB   | RAM               |
+| 0x4000–0x5FFF | 8KB   | Video RAM         |
+| 0x6000–0x6FFF | 4KB   | I/O Ports         |
+| 0x7000–0x7FFF | 4KB   | Free              |
+| 0x8000–0xFFFF | 32KB  | Secondary ROM     |
 
 ---
 
-### 2-Byte Instructions
+## 🚩 Flags
 
-- Used for register-register operations.
-- 5-bit opcode, 3-bit mode, 4-bit destination, 4-bit source.
-
-#### Format:
-
-OP Rd, Rs => [opcode][mode][Rd][Rs] 5b 3b 4b 4b
-
-
-#### Example:
-
-ADD R0, R1 => 00111 000 0000 0001
-
-
-> 📝 Register-immediate operations **not supported** in 2-byte format due to reg field limits. Use 3-byte instead.
-
-#### Indirect memory access:
-
-LDR R0, [R1]
-
-
-Uses the same encoding as register-register.
+| Bit | Name | Description        |
+|-----|------|--------------------|
+| 000 | Z    | Zero               |
+| 001 | C    | Carry              |
+| 010 | N    | Negative (MSB)     |
+| 011 | V    | Overflow           |
+| 100 | I    | Interrupt Enable   |
+| 101–111 | - | Reserved          |
 
 ---
 
-## IO Specific Instructions
+## 🧾 Instruction Classes
 
-Special `IOGET` and `IOPUT` instructions replace standard `INN` and `OUT`.
-
-- I/O space: `0x6000 – 0x6FFF` (12-bit addressing)
-- Modes: direct (3B), indirect (2B)
-
-### Indirect Example:
-
-IOGET Rn, [IOn] => [opcode][mode][gp_reg_id][io_reg_id] 5b 3b 4b 3b
-
+- **1-Byte**: Simple operations (e.g., `NOP`, `INC Rn`)
+- **2-Byte**: Register-to-register or short immediate ops
+- **3-Byte**: Memory, I/O, and immediate addressing
 
 ---
 
-### 3-Byte Instructions
+## 🔡 Encoding Summary
 
-Most complex but powerful.
+### 1-Byte Instruction
 
-#### Memory Access Format:
+```
+OP Rn => [opcode:5b][reg:3b]
+```
 
-OP Rn, [0x1234] => [opcode][reg_id][bin_12][bin_34] 5b 3b 8b 8b
+Example: `INC R0 => 00100 000`
 
+### 2-Byte Instruction
 
-#### Example:
+```
+OP Rd, Rs => [opcode:5b][mode:3b][Rd:4b][Rs:4b]
+```
 
-LOAD R0, [0x250F] => 10001 000 00101001 00001111
+Example: `ADD R0, R1 => 00111 000 0000 0001`
 
+### 3-Byte Instruction
 
----
+```
+OP Rn, [0x1234] => [opcode:5b][reg:3b][addr:16b]
+```
 
-#### Multi-load example:
-
-LDRMI R0-R7, [PC], #0x8
-
-
-Loads 8 blocks into R0-R7 from address in PC (auto-increment by 2B).
-
----
-
-#### Immediate ALU Operation
-
-ADDI R0, #0x123
-
-
-#### Encoding:
-
-ADDI R0, #0x123 => 11000 000 0000 000100100011
-
+Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-### 3-Byte IO Direct Addressing
+## 🧃 IO Instructions
 
-IOGET Rn, [0x6123] => [opcode][mode][gp_reg_id][IO_mem_addr] 5b 3b 4b 12b
+- **Indirect (2B)**: `IOGET Rn, [IOn] => [opcode][mode][gp_reg][io_reg]`
+- **Direct (3B)**: `IOGET Rn, [0x6123] => [opcode][mode][gp_reg][addr:12b]`
 
+---
 
-#### Example:
+## 🧮 Sample Opcodes
 
-IOGET R0, [0x6123] => 11100 000 0000 0110000100100011
+### 1-Byte
+
+| Opcode | Mnemonic | Description           |
+|--------|----------|-----------------------|
+| 00000  | NOP      | No operation          |
+| 00001  | RET      | Return from subroutine|
+
+### 2-Byte
+
+| Opcode | Mnemonic | Mode | Description         |
+|--------|----------|------|---------------------|
+| 00010  | SETF     | imm8 | Load flags          |
+| 00100  | CMP      | reg  | Compare and set flags|
+| 01000  | ADD      | reg/imm | Add               |
+
+### 3-Byte
+
+| Opcode | Mnemonic | Description           |
+|--------|----------|-----------------------|
+| 10000  | LDR      | Load from memory      |
+| 10010  | IOGET    | Read from IO          |
+| 10011  | IOPUT    | Write to IO           |
+
+---
+
+## 🧩 Architecture Overview
+
+- **Register File**: 8 GPRs + ACC, SP, PC, FL, IO0–IO3
+- **ALU**: 16-bit capable, flag-aware
+- **Decoder**: Supports 1B, 2B, 3B instruction formats
+- **Memory Interface**: Unified data/instruction bus
+- **Control Unit**: Hardcoded FSM (for now)
+
+---
+
+## 📌 Notes
+
+- Avoid 3-byte instructions unless necessary (slowest)
+- Use `LDRMI`, `STRMI` for efficient block transfer
+- ISA includes planned space for future opcodes (0b10111–0b11111)
+
+---
+
+## 📣 Coming Soon
+
+- Microcoded control logic
+- Instruction pipeline optimization
+- Fantasy game demo ROM
+
+---
+
+## 🧑‍💻 Author
+
+**Venator158**  
+[GitHub](https://github.com/venator158)
+
+---
+
+Inspired by retro consoles, built for modern HDL tinkerers!
