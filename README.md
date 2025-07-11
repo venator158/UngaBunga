@@ -5,7 +5,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## ⚙️ BUNGA–8 CPU Overview
+## BUNGA–8 CPU Overview
 
 | Field               | Value                  |
 |---------------------|------------------------|
@@ -19,7 +19,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## 🧠 Register Set
+## Register Set
 
 | Name | Code  | Size | Description         |
 |------|-------|------|---------------------|
@@ -32,7 +32,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## 🗺️ Memory Map
+## Memory Map
 
 | Range         | Size  | Description       |
 |---------------|-------|-------------------|
@@ -45,7 +45,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## 🚩 Flags
+## Flags
 
 | Bit | Name | Description        |
 |-----|------|--------------------|
@@ -58,7 +58,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## 🧾 Instruction Classes
+## Instruction Classes
 
 - **1-Byte**: Simple operations (e.g., `NOP`, `INC Rn`)
 - **2-Byte**: Register-to-register or short immediate ops
@@ -66,7 +66,7 @@ A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8*
 
 ---
 
-## 🔡 Encoding Summary
+## Encoding Summary
 
 ### 1-Byte Instruction
 
@@ -94,14 +94,14 @@ Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-## 🧃 IO Instructions
+## IO Instructions
 
 - **Indirect (2B)**: `IOGET Rn, [IOn] => [opcode][mode][gp_reg][io_reg]`
 - **Direct (3B)**: `IOGET Rn, [0x6123] => [opcode][mode][gp_reg][addr:12b]`
 
 ---
 
-## 🧮 Sample Opcodes
+## Sample Opcodes
 
 ### 1-Byte
 
@@ -128,7 +128,7 @@ Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-## 🧩 Architecture Overview
+## Architecture Overview
 
 - **Register File**: 8 GPRs + ACC, SP, PC, FL, IO0–IO3
 - **ALU**: 16-bit capable, flag-aware
@@ -138,7 +138,7 @@ Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-## 📌 Notes
+## Notes
 
 - Avoid 3-byte instructions unless necessary (slowest)
 - Use `LDRMI`, `STRMI` for efficient block transfer
@@ -146,7 +146,7 @@ Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-## 📣 Coming Soon
+## Coming Soon
 
 - Microcoded control logic
 - Instruction pipeline optimization
@@ -154,7 +154,7 @@ Example: `LOAD R0, [0x250F] => 10001 000 00101001 00001111`
 
 ---
 
-## 🧑‍💻 Author
+## Author
 
 **Venator158**  
 [GitHub](https://github.com/venator158)
