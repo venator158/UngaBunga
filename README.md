@@ -1,5 +1,5 @@
 
-# 🕹️ UNGA BUNGA Console
+# UNGA BUNGA Console
 
 A homebrew 8-bit fantasy console with a custom CPU architecture — **BUNGA–8**. Designed for learning and experimentation, it mimics retro-style hardware with modern HDL techniques.
 
